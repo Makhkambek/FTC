@@ -62,14 +62,29 @@ public class AutonBase extends LinearOpMode {
 //    RobotCameraHandler robotCameraHandler;
 //    RobotControlGripperServos clawServo2;
 //    RobotControlArm armMotor;
+      ArmSystem lift_system;
+      ArmSystem hang_system_1;
+      ArmSystem hang_system_2;
+      IntakeSystem intake;
+      IntakeSystem intake1;
+      IntakeSystem intake2;
+      IntakeSystem intakeArm;
 
     public void initialize() {
-//        theHardwareMap  = new RobotHardwareMap(hardwareMap, this);
+        theHardwareMap  = new RobotHardwareMap(hardwareMap, this);
 //        robotCameraHandler = new RobotCameraHandler(theHardwareMap, this);
 //        lights = new RobotControlLights(theHardwareMap, this);
 
         theHardwareMap.initialize();
 //        robotCameraHandler.initialize();
+          lift_system = new ArmSystem(theHardwareMap, this);
+          hang_system_1 = new ArmSystem(theHardwareMap, this);
+          hang_system_2 = new ArmSystem(theHardwareMap, this);
+          intake = new IntakeSystem(theHardwareMap, this);
+          intake1 = new IntakeSystem(theHardwareMap, this);
+          intake2 = new IntakeSystem(theHardwareMap, this);
+          intakeArm = new IntakeSystem(theHardwareMap, this);
+
 //        clawServo1 = new RobotControlGripperServos(theHardwareMap, this, "ServoClaw1");
 //        clawServo2 = new RobotControlGripperServos(theHardwareMap, this, "ServoClaw2");
 //        armMotor = new RobotControlArm(theHardwareMap,this);
