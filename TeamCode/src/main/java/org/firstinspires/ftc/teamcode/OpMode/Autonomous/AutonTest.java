@@ -7,19 +7,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 @Autonomous(name = "Auton Test", group = "Autons")
 public class AutonTest extends AutonBase {
 
-    RobotHardwareMap robotHardwareMap;
-    DcMotor rearLeftMotor;
-    DcMotor rearRightMotor;
-    DcMotor frontLeftMotor;
-    DcMotor frontRightMotor;
     @Override
     public void runOpMode(){
-        robotHardwareMap = new RobotHardwareMap(hardwareMap, this);
-        robotHardwareMap.initialize();
-        frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
-        rearLeftMotor = hardwareMap.dcMotor.get("rearLeftMotor");
-        frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
-        rearRightMotor = hardwareMap.dcMotor.get("rearRightMotor");
+        theHardwareMap = new RobotHardwareMap(hardwareMap, this);
+        super.initialize();
         waitForStart();
 
         imuDrive(0.2, 20, 0);
