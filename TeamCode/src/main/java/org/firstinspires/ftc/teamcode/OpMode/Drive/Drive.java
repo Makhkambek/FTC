@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpMode.Drive;
 
+import static java.lang.Thread.sleep;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -10,17 +12,23 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 @TeleOp(name = "MainDrive")
 public class Drive extends OpMode {
 
+    //ArmSystem
     DcMotor lift_system;
     DcMotor hang_system_1;
     DcMotor hang_system_2;
+    //IntakeSystem
     public Servo intake1;
     public Servo intake2;
+    public Servo intakeArm; //один серво - Рука
+    public Servo servo_lift;
+    DcMotor intake;
 
 
     DigitalChannel liftLimitSwitch;
     DigitalChannel touchSensor_1;
     DigitalChannel touchSensor_2;
 
+    //Base
     DcMotor frontLeftMotor;
     DcMotor rearLeftMotor;
     DcMotor frontRightMotor;
@@ -35,6 +43,13 @@ public class Drive extends OpMode {
     boolean rBumperPressed = false;
     boolean lBumperPressed = false;
 
+    private enum State {
+        INTAKE_OFF,
+        INTAKE_ON,
+        INTAKE_ARM_ON
+    }
+
+    private State currentState;
 
     @Override
     public void init() {
@@ -44,6 +59,9 @@ public class Drive extends OpMode {
 
         intake1 = hardwareMap.get(Servo.class, "intake1");
         intake2 = hardwareMap.get(Servo.class, "intake2");
+        intakeArm = hardwareMap.get(Servo.class, "intakeArm");
+        servo_lift = hardwareMap.get(Servo.class, "servo_lift");
+        intake = hardwareMap.dcMotor.get("intake");
 
         frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
         rearLeftMotor = hardwareMap.dcMotor.get("rearLeftMotor");
@@ -63,6 +81,9 @@ public class Drive extends OpMode {
 
         touchSensor_2 = hardwareMap.digitalChannel.get("touchSensor_2");
         touchSensor_2.setMode(DigitalChannel.Mode.INPUT);
+
+        currentState = State.INTAKE_OFF;
+
     }
 
     @Override
@@ -81,25 +102,70 @@ public class Drive extends OpMode {
         } else {
             telemetry.addData("Touch Sensor State", "no");
         }
-
         telemetry.update();
 
-        if (gamepad1.circle) {
-            intake1.setPosition(0.6);
-            intake2.setPosition(0);
-        } else {
-            intake1.setPosition(0);
-            intake2.setPosition(0.6);
+        updateState(gamepad1.right_bumper);
+
+        switch (currentState) {
+            case INTAKE_OFF:
+                intakeOff();
+                break;
+            case INTAKE_ON:
+                intakeOn();
+                break;
+            case INTAKE_ARM_ON:
+                intakeArmOn();
+                break;
+            default:
+                break;
         }
 
         processRTrigger();
         processLTrigger();
-        processRBumper();
         processLBumper();
         processJoystick();
+//        try {
+////            processRBumper();
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
-    //Функции
+    private void updateState(boolean isRBumperPressed) {
+        switch (currentState) {
+            case INTAKE_OFF:
+                if(isRBumperPressed) {
+                    currentState = State.INTAKE_ON;
+                }
+                break;
+            case INTAKE_ON:
+                currentState = State.INTAKE_ARM_ON;
+                break;
+            case INTAKE_ARM_ON:
+                if(!isRBumperPressed) {
+                    currentState = State.INTAKE_OFF;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void intakeOn() {
+        intake1.setPosition(0.6);
+        intake2.setPosition(0);
+    }
+    private void intakeOff() {
+        intake1.setPosition(0);
+        intake2.setPosition(0.6);
+        intakeArm.setPosition(0.9);
+        intake.setPower(0);
+    }
+    private void intakeArmOn() {
+        intakeArm.setPosition(0.4);
+        intake.setPower(1);
+    }
+
 
     private void processRTrigger() {
         if (gamepad1.right_trigger > 0) {
@@ -109,18 +175,20 @@ public class Drive extends OpMode {
         }
 
         if (rTriggerPressed) {
-            lift_system.setPower(1);
+//            lift_system.setPower(1);
             hang_system_1.setPower(1);
             hang_system_2.setPower(1);
+            servo_lift.setPosition(0.2);
         } else {
             lift_system.setPower(0);
             hang_system_1.setPower(0);
             hang_system_2.setPower(0);
+            servo_lift.setPosition(0.8);
         }
     }
 
 
-        private void processLTrigger() {
+    private void processLTrigger() {
         if (gamepad1.left_trigger > 0) {
             lTriggerPressed = true;
         } else {
@@ -128,7 +196,7 @@ public class Drive extends OpMode {
         }
         if (lTriggerPressed) {
             if (liftLimitSwitch.getState()) {
-                lift_system.setPower(-0.7);
+//                lift_system.setPower(-0.7);
             } else {
                 lift_system.setPower(0);
             }
@@ -148,15 +216,33 @@ public class Drive extends OpMode {
     }
 
 
-    private void processRBumper() {
-        if (gamepad1.right_bumper) {
-            rBumperPressed = true;
-        } else {
-            rBumperPressed = false;
-        }
 
-        // Добавьте здесь свою логику для кнопки правого бампера
-    }
+
+
+
+
+
+
+
+//    private void processRBumper() throws InterruptedException {
+//        if (gamepad1.right_bumper) {
+//            rBumperPressed = true;
+//        } else {
+//            rBumperPressed = false;
+//        }
+//        if(rBumperPressed) {
+//            intake1.setPosition(0.6);
+//            intake2.setPosition(0);
+//            sleep(1000);
+//            intakeArm.setPosition(0.4);
+//            intake.setPower(1);
+//        } else {
+//            intake1.setPosition(0);
+//            intake2.setPosition(0.6);
+//            intakeArm.setPosition(0.9);
+//            intake.setPower(0);
+//        }
+//    }
 
     private void processLBumper() {
         if (gamepad1.left_bumper) {
@@ -164,12 +250,11 @@ public class Drive extends OpMode {
         } else {
             lBumperPressed = false;
         }
-
-        // Добавьте здесь свою логику для кнопки левого бампера
+        if(lBumperPressed) intake.setPower(-1);
     }
 
     private void processJoystick() {
-        double y = gamepad1.left_stick_y;
+        double y = -gamepad1.left_stick_y;
         double x = gamepad1.left_stick_x * 1.1;
         double rx = -gamepad1.right_stick_x;
 

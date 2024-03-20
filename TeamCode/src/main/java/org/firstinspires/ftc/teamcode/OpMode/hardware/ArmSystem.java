@@ -1,13 +1,22 @@
 package org.firstinspires.ftc.teamcode.OpMode.hardware;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+import static org.firstinspires.ftc.teamcode.OpMode.hardware.RobotGlobalSettings.initialize;
 
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.Servo;
 
 public class ArmSystem {
 
+    RobotHardwareMap robotHardwareMap;
+    LinearOpMode opMode;
+    public ArmSystem(RobotHardwareMap robotHardwareMap, LinearOpMode opMode){
+        this.opMode = opMode;
+        this.robotHardwareMap = robotHardwareMap;
+        initialize();
+    }
     DcMotor lift_system;
     DcMotor hang_system_1;
     DcMotor hang_system_2;
@@ -31,7 +40,6 @@ public class ArmSystem {
     }
 
     public void startArm() {
-
         lift_system.setPower(1);
         hang_system_1.setPower(1);
         hang_system_2.setPower(1);
