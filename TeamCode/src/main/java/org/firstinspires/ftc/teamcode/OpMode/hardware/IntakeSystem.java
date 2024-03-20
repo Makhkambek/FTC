@@ -1,10 +1,20 @@
 package org.firstinspires.ftc.teamcode.OpMode.hardware;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+import static org.firstinspires.ftc.teamcode.OpMode.hardware.RobotGlobalSettings.initialize;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class IntakeSystem {
+
+    RobotHardwareMap robotHardwareMap;
+    LinearOpMode opMode;
+    public IntakeSystem(RobotHardwareMap robotHardwareMap, LinearOpMode opMode){
+        this.opMode = opMode;
+        this.robotHardwareMap = robotHardwareMap;
+        initialize();
+    }
     public Servo intake1;
     public Servo intake2;
     public Servo intakeArm; //рука
