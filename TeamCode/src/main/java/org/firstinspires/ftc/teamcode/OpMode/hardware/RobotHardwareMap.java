@@ -80,10 +80,12 @@ public class RobotHardwareMap {
         controlHub = baseHMap.get(LynxModule.class, "Control Hub");
         expansionHub = baseHMap.get(LynxModule.class, "Expansion Hub");
 
-        rearLeftMotor = baseHMap.get(DcMotor.class, "rearLeftMotor");
-        rearRightMotor = baseHMap.get(DcMotor.class, "rearRightMotor");
-        frontLeftMotor = baseHMap.get(DcMotor.class, "frontLeftMotor");
         frontRightMotor = baseHMap.get(DcMotor.class, "frontRightMotor");
+        rearLeftMotor = baseHMap.get(DcMotor.class, "rearLeftMotor");
+        frontLeftMotor = baseHMap.get(DcMotor.class, "frontLeftMotor");
+        rearRightMotor = baseHMap.get(DcMotor.class, "rearRightMotor");
+//        frontLeftMotor = baseHMap.get(DcMotor.class, "frontLeftMotor");
+//        frontRightMotor = baseHMap.get(DcMotor.class, "frontRightMotor");
         liftMotor = baseHMap.get(DcMotor.class, "lift_system");
 
         //Camera
