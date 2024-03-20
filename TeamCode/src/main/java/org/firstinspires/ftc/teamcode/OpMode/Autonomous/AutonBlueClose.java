@@ -7,29 +7,31 @@ import org.firstinspires.ftc.teamcode.OpMode.Autonomous.CSVisionProcessor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.OpMode.hardware.IntakeSystem;
 import org.firstinspires.ftc.teamcode.OpMode.hardware.ArmSystem;
+import org.firstinspires.ftc.teamcode.OpMode.hardware.RobotHardwareMap;
 
 
 @Autonomous(name = "Auton Blue Close To Backstage", group = "Autons")
 public class AutonBlueClose extends AutonBase {
 
     private int parkingPosition = -1;
-    IntakeSystem intakeSystem = new IntakeSystem(); // Создание экземпляра класса IntakeSystem
-    ArmSystem armSystem = new ArmSystem(); // Создание переменной класса ArmSystem
-
-    private int lastParkingPosition = -1;
+    private int     lastParkingPosition = -1;
+    IntakeSystem intakeSystem = new IntakeSystem(theHardwareMap, this); // Создание экземпляра класса IntakeSystem
+    ArmSystem armSystem = new ArmSystem(theHardwareMap, this); // Создание переменной класса ArmSystem
 
     @Override
     public void runOpMode() {
+        theHardwareMap = new RobotHardwareMap(hardwareMap, this );
+        super.initialize();
 
         boolean left = false;
         boolean middle = false;
         boolean right = true;
 
-        initialize();
+//        initialize();
 
         while (opModeInInit()) {
 //            //check that the camera is open and working
-            armSystem.checkSensors(); // проверка состояния сенсоров
+//            armSystem.checkSensors(); // проверка состояния сенсоров
 
 
             if (lastParkingPosition != parkingPosition) {
