@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.OpMode.Drive;
 
-import static java.lang.Thread.sleep;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
