@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.OpMode.Drive;
 
 
+import static java.lang.Thread.sleep;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -102,32 +104,16 @@ public class Drive extends OpMode {
             telemetry.addData("Touch Sensor State", "no");
         }
         telemetry.update();
-
-        updateState(gamepad1.right_bumper);
-
-        switch (currentState) {
-            case INTAKE_OFF:
-                intakeOff();
-                break;
-            case INTAKE_ON:
-                intakeOn();
-                break;
-            case INTAKE_ARM_ON:
-                intakeArmOn();
-                break;
-            default:
-                break;
-        }
-
+        
         processRTrigger();
         processLTrigger();
         processLBumper();
         processJoystick();
-//        try {
-////            processRBumper();
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
+        try {
+            processRBumper();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void updateState(boolean isRBumperPressed) {
@@ -223,25 +209,27 @@ public class Drive extends OpMode {
 
 
 
-//    private void processRBumper() throws InterruptedException {
-//        if (gamepad1.right_bumper) {
-//            rBumperPressed = true;
-//        } else {
-//            rBumperPressed = false;
-//        }
-//        if(rBumperPressed) {
-//            intake1.setPosition(0.6);
-//            intake2.setPosition(0);
-//            sleep(1000);
-//            intakeArm.setPosition(0.4);
-//            intake.setPower(1);
-//        } else {
-//            intake1.setPosition(0);
-//            intake2.setPosition(0.6);
-//            intakeArm.setPosition(0.9);
-//            intake.setPower(0);
-//        }
-//    }
+    private void processRBumper() throws InterruptedException {
+        if (gamepad1.right_bumper) {
+            rBumperPressed = true;
+        } else {
+            rBumperPressed = false;
+        }
+        if(rBumperPressed) {
+            double t = getRuntime();
+            intake1.setPosition(0.6);
+            intake2.setPosition(0);
+            if(getRuntime() - t > 3) {
+                intakeArm.setPosition(0.4);
+                intake.setPower(1);
+            }
+        } else {
+            intake1.setPosition(0);
+            intake2.setPosition(0.6);
+            intakeArm.setPosition(0.9);
+            intake.setPower(0);
+        }
+    }
 
     private void processLBumper() {
         if (gamepad1.left_bumper) {
