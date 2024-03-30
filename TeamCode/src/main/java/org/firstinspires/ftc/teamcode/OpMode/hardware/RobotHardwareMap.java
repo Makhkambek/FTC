@@ -48,9 +48,9 @@ public class RobotHardwareMap {
     DigitalChannel touchSensor_1;
     DigitalChannel touchSensor_2;
 
-    public Servo servo_intake;
-    public Servo servo2_intake;
-    public Servo servo3_intake;
+    public Servo intake1;
+    public Servo intake2;
+    public Servo intakeArm;
     public Servo servo_lift;
     public Servo servo_plane;
 
@@ -59,7 +59,6 @@ public class RobotHardwareMap {
 
     private final int baseResolution_x = 320;
     private final int baseResolution_y = 240;
-//    WebcamName frontCamera;
     WebcamName backCamera;
 
     boolean controlHubBatteryVoltageEnabled = true;
@@ -84,14 +83,12 @@ public class RobotHardwareMap {
         rearLeftMotor = baseHMap.get(DcMotor.class, "rearLeftMotor");
         frontLeftMotor = baseHMap.get(DcMotor.class, "frontLeftMotor");
         rearRightMotor = baseHMap.get(DcMotor.class, "rearRightMotor");
-//        frontLeftMotor = baseHMap.get(DcMotor.class, "frontLeftMotor");
-//        frontRightMotor = baseHMap.get(DcMotor.class, "frontRightMotor");
         liftMotor = baseHMap.get(DcMotor.class, "lift_system");
 
         //Camera
         try {
 //            frontCamera = baseHMap.get(WebcamName.class, "Front Camera");
-            backCamera = baseHMap.get(WebcamName.class, "Back Camera");
+            backCamera = baseHMap.get(WebcamName.class, "Webcam 1");
             opMode.telemetry.addData("cameras", "success ");
         } catch (IllegalArgumentException iae){
             opMode.telemetry.addData("cameras", iae.getMessage());

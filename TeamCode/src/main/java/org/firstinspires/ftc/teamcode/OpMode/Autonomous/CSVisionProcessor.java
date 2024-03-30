@@ -45,26 +45,11 @@ public class CSVisionProcessor  implements VisionProcessor{
         return _csVision;
     }
 
-    public static StartingPosition getPosition(){
-        return _csVision.getStartingPosition();
-    }
+//    public static StartingPosition getPosition(){
+//        return _csVision.getStartingPosition();
+//    }
 
 
-    public static int getIntPosition(){
-        StartingPosition pos = _csVision.getStartingPosition();
-
-        if(pos == StartingPosition.LEFT){
-            return 1;
-        }
-        else if(pos == StartingPosition.CENTER){
-            return 2;
-        }
-        else if(pos == StartingPosition.RIGHT){
-            return 3;
-        }
-
-        return 0;
-    }
 
     public CSVisionProcessor(int width, int leftX, int leftY, int middleX, int middleY, int rightX, int rightY){
         rectLeft = new Rect(leftX, leftY,width, width);

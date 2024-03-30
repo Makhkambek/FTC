@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.OpMode.Drive;
 
+import static java.lang.Thread.sleep;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
@@ -42,13 +44,16 @@ public class Drive extends OpMode {
     boolean rBumperPressed = false;
     boolean lBumperPressed = false;
 
-    private enum State {
-        INTAKE_OFF,
-        INTAKE_ON,
-        INTAKE_ARM_ON
+    private enum BumperState {
+        BUMPER_NOT_PRESSED,
+        BUMPER_PRESSED_WAITING,
+        BUMPER_PRESSED_TIME_UP,
     }
 
-    private State currentState;
+
+    private BumperState stateVar = BumperState.BUMPER_NOT_PRESSED;
+    private int waitStartTime = 0;
+
 
     @Override
     public void init() {
@@ -71,6 +76,7 @@ public class Drive extends OpMode {
         rearRightMotor.setDirection(DcMotor.Direction.REVERSE);
         hang_system_1.setDirection(DcMotor.Direction.REVERSE);
         hang_system_2.setDirection(DcMotor.Direction.REVERSE);
+        intake.setDirection(DcMotor.Direction.REVERSE);
 
         liftLimitSwitch = hardwareMap.digitalChannel.get("liftLimitSwitch");
         liftLimitSwitch.setMode(DigitalChannel.Mode.INPUT);
@@ -80,8 +86,6 @@ public class Drive extends OpMode {
 
         touchSensor_2 = hardwareMap.digitalChannel.get("touchSensor_2");
         touchSensor_2.setMode(DigitalChannel.Mode.INPUT);
-
-        currentState = State.INTAKE_OFF;
 
     }
 
@@ -103,169 +107,137 @@ public class Drive extends OpMode {
         }
         telemetry.update();
 
-        updateState(gamepad1.right_bumper);
 
-        switch (currentState) {
-            case INTAKE_OFF:
-                intakeOff();
-                break;
-            case INTAKE_ON:
-                intakeOn();
-                break;
-            case INTAKE_ARM_ON:
-                intakeArmOn();
-                break;
-            default:
-                break;
+        if (rBumperPressed){
+            waitStartTime = 0;
+        }
+        if (waitStartTime < 2){
+            stateVar = BumperState.BUMPER_PRESSED_WAITING;
+        }
+//        else if (waitStartTime > 2 && waitStartTime < 1000){
+//            stateVar = BumperState.BUMPER_PRESSED_TIME_UP;
+//        }
+        else {
+            stateVar = BumperState.BUMPER_NOT_PRESSED;
+        }
+        if (gamepad1.left_bumper) {
+            waitStartTime = 1000;
         }
 
+
+        if(gamepad1.circle) {
+            intakeArm.setPosition(0.28);
+            intake.setPower(1);
+        } else {
+            intakeArm.setPosition(0.65);
+            intake.setPower(0);
+        }
+
+
+        processRBumper();
         processRTrigger();
         processLTrigger();
         processLBumper();
         processJoystick();
-//        try {
-////            processRBumper();
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
     }
 
-    private void updateState(boolean isRBumperPressed) {
-        switch (currentState) {
-            case INTAKE_OFF:
-                if(isRBumperPressed) {
-                    currentState = State.INTAKE_ON;
+
+
+    private void processRBumper() {
+        rBumperPressed = gamepad1.right_bumper;
+        switch (stateVar) {
+            case BUMPER_NOT_PRESSED:
+//                intakeArm.setPosition(0.4);
+                intake1.setPosition(0.);
+                intake2.setPosition(0.6);
+//                intake.setPower(0);
+                break;
+            case BUMPER_PRESSED_WAITING:
+                intake1.setPosition(0.6);
+                intake2.setPosition(0);
+                break;
+            case BUMPER_PRESSED_TIME_UP:
+//                intakeArm.setPosition(0.9);
+//                intake.setPower(-1);
+                if (!rBumperPressed) {
+                    stateVar = BumperState.BUMPER_NOT_PRESSED;
+                } else {
+                    stateVar = BumperState.BUMPER_PRESSED_WAITING;
                 }
                 break;
-            case INTAKE_ON:
-                currentState = State.INTAKE_ARM_ON;
-                break;
-            case INTAKE_ARM_ON:
-                if(!isRBumperPressed) {
-                    currentState = State.INTAKE_OFF;
-                }
-                break;
-            default:
-                break;
         }
     }
+        private void processRTrigger () {
+            if (gamepad1.right_trigger > 0) {
+                rTriggerPressed = true;
+            } else {
+                rTriggerPressed = false;
+            }
 
-    private void intakeOn() {
-        intake1.setPosition(0.6);
-        intake2.setPosition(0);
-    }
-    private void intakeOff() {
-        intake1.setPosition(0);
-        intake2.setPosition(0.6);
-        intakeArm.setPosition(0.9);
-        intake.setPower(0);
-    }
-    private void intakeArmOn() {
-        intakeArm.setPosition(0.4);
-        intake.setPower(1);
-    }
-
-
-    private void processRTrigger() {
-        if (gamepad1.right_trigger > 0) {
-            rTriggerPressed = true;
-        } else {
-            rTriggerPressed = false;
-        }
-
-        if (rTriggerPressed) {
-//            lift_system.setPower(1);
-            hang_system_1.setPower(1);
-            hang_system_2.setPower(1);
-            servo_lift.setPosition(0.2);
-        } else {
-            lift_system.setPower(0);
-            hang_system_1.setPower(0);
-            hang_system_2.setPower(0);
-            servo_lift.setPosition(0.8);
-        }
-    }
-
-
-    private void processLTrigger() {
-        if (gamepad1.left_trigger > 0) {
-            lTriggerPressed = true;
-        } else {
-            lTriggerPressed = false;
-        }
-        if (lTriggerPressed) {
-            if (liftLimitSwitch.getState()) {
-//                lift_system.setPower(-0.7);
+            if (rTriggerPressed) {
+                lift_system.setPower(0.65);
+                hang_system_1.setPower(1);
+                hang_system_2.setPower(1);
+                servo_lift.setPosition(0.2);
             } else {
                 lift_system.setPower(0);
-            }
-
-            if (touchSensor_1.getState()) {
-                hang_system_1.setPower(-1);
-            } else {
                 hang_system_1.setPower(0);
-            }
-
-            if (touchSensor_2.getState()) {
-                hang_system_2.setPower(-1);
-            } else {
                 hang_system_2.setPower(0);
+//                servo_lift.setPosition(0.7);
             }
         }
-    }
 
 
+        private void processLTrigger () {
+            if (gamepad1.left_trigger > 0) {
+                lTriggerPressed = true;
+            } else {
+                lTriggerPressed = false;
+            }
+            if (lTriggerPressed) {
+                servo_lift.setPosition(0.75);
+                if (liftLimitSwitch.getState()) {
+                    lift_system.setPower(-0.7);
+                } else {
+                    lift_system.setPower(0);
+                }
 
+                if (touchSensor_1.getState()) {
+                    hang_system_1.setPower(-1);
+                } else {
+                    hang_system_1.setPower(0);
+                }
 
-
-
-
-
-
-
-//    private void processRBumper() throws InterruptedException {
-//        if (gamepad1.right_bumper) {
-//            rBumperPressed = true;
-//        } else {
-//            rBumperPressed = false;
-//        }
-//        if(rBumperPressed) {
-//            intake1.setPosition(0.6);
-//            intake2.setPosition(0);
-//            sleep(1000);
-//            intakeArm.setPosition(0.4);
-//            intake.setPower(1);
-//        } else {
-//            intake1.setPosition(0);
-//            intake2.setPosition(0.6);
-//            intakeArm.setPosition(0.9);
-//            intake.setPower(0);
-//        }
-//    }
-
-    private void processLBumper() {
-        if (gamepad1.left_bumper) {
-            lBumperPressed = true;
-        } else {
-            lBumperPressed = false;
+                if (touchSensor_2.getState()) {
+                    hang_system_2.setPower(-1);
+                } else {
+                    hang_system_2.setPower(0);
+                }
+            }
         }
-        if(lBumperPressed) intake.setPower(-1);
+        private void processLBumper () {
+            if (gamepad2.left_bumper) {
+                lBumperPressed = true;
+            } else {
+                lBumperPressed = false;
+            }
+            if (lBumperPressed) intake.setPower(-1);
+        }
+
+        private void processJoystick () {
+            double y = -gamepad1.left_stick_y;
+            double x = gamepad1.left_stick_x * 1.1;
+            double rx = -gamepad1.right_stick_x;
+
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+            double frontLeftPower = (y + x + rx) / denominator;
+            double backLeftPower = (y - x + rx) / denominator;
+            double frontRightPower = (y - x - rx) / denominator;
+            double backRightPower = (y + x - rx) / denominator;
+
+            frontLeftMotor.setPower(frontLeftPower);
+            rearLeftMotor.setPower(backLeftPower);
+            frontRightMotor.setPower(frontRightPower);
+            rearRightMotor.setPower(backRightPower);
+        }
     }
-
-    private void processJoystick() {
-        double y = -gamepad1.left_stick_y;
-        double x = gamepad1.left_stick_x * 1.1;
-        double rx = -gamepad1.right_stick_x;
-
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-        double frontLeftPower = (y + x + rx) / denominator;
-        double backLeftPower = (y - x + rx) / denominator;
-        double frontRightPower = (y - x - rx) / denominator;
-        double backRightPower = (y + x - rx) / denominator;
-
-        frontLeftMotor.setPower(frontLeftPower);
-        rearLeftMotor.setPower(backLeftPower);
-        frontRightMotor.setPower(frontRightPower);
-        rearRightMotor.setPower(backRightPower);
-    }
-}

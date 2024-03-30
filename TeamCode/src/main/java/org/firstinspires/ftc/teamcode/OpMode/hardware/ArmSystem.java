@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.OpMode.hardware.RobotGlobalSettings
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class ArmSystem {
 
@@ -40,7 +41,7 @@ public class ArmSystem {
     }
 
     public void startArm() {
-        lift_system.setPower(1);
+        lift_system.setPower(0.5);
         hang_system_1.setPower(1);
         hang_system_2.setPower(1);
     }
