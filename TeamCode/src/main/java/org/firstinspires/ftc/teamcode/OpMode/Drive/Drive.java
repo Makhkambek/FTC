@@ -114,14 +114,19 @@ public class Drive extends OpMode {
         if (waitStartTime < 2){
             stateVar = BumperState.BUMPER_PRESSED_WAITING;
         }
-//        else if (waitStartTime > 2 && waitStartTime < 1000){
-//            stateVar = BumperState.BUMPER_PRESSED_TIME_UP;
-//        }
         else {
             stateVar = BumperState.BUMPER_NOT_PRESSED;
         }
         if (gamepad1.left_bumper) {
             waitStartTime = 1000;
+        }
+
+        if(gamepad1.dpad_up) {
+            hang_system_1.setPower(1);
+            hang_system_2.setPower(1);
+        } else if (gamepad1.dpad_down) {
+            hang_system_1.setPower(-1);
+            hang_system_2.setPower(-1);
         }
 
 
@@ -147,18 +152,14 @@ public class Drive extends OpMode {
         rBumperPressed = gamepad1.right_bumper;
         switch (stateVar) {
             case BUMPER_NOT_PRESSED:
-//                intakeArm.setPosition(0.4);
-                intake1.setPosition(0.);
+                intake1.setPosition(0);
                 intake2.setPosition(0.6);
-//                intake.setPower(0);
                 break;
             case BUMPER_PRESSED_WAITING:
                 intake1.setPosition(0.6);
                 intake2.setPosition(0);
                 break;
             case BUMPER_PRESSED_TIME_UP:
-//                intakeArm.setPosition(0.9);
-//                intake.setPower(-1);
                 if (!rBumperPressed) {
                     stateVar = BumperState.BUMPER_NOT_PRESSED;
                 } else {
@@ -175,7 +176,7 @@ public class Drive extends OpMode {
             }
 
             if (rTriggerPressed) {
-                lift_system.setPower(0.65);
+                lift_system.setPower(0.5);
                 hang_system_1.setPower(1);
                 hang_system_2.setPower(1);
                 servo_lift.setPosition(0.2);
@@ -183,7 +184,6 @@ public class Drive extends OpMode {
                 lift_system.setPower(0);
                 hang_system_1.setPower(0);
                 hang_system_2.setPower(0);
-//                servo_lift.setPosition(0.7);
             }
         }
 
@@ -226,7 +226,7 @@ public class Drive extends OpMode {
 
         private void processJoystick () {
             double y = -gamepad1.left_stick_y;
-            double x = gamepad1.left_stick_x * 1.1;
+            double x = -gamepad1.left_stick_x * 1.1;
             double rx = -gamepad1.right_stick_x;
 
             double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);

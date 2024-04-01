@@ -4,6 +4,8 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 import static org.firstinspires.ftc.teamcode.OpMode.hardware.RobotGlobalSettings.initialize;
 
 
+import static java.lang.Thread.sleep;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -21,6 +23,7 @@ public class ArmSystem {
     DcMotor lift_system;
     DcMotor hang_system_1;
     DcMotor hang_system_2;
+    public Servo servo_lift;
 
     DigitalChannel liftLimitSwitch;
     DigitalChannel touchSensor_1;
@@ -29,6 +32,7 @@ public class ArmSystem {
         lift_system = hardwareMap.dcMotor.get("lift_system");
         hang_system_1 = hardwareMap.dcMotor.get("hang_system_1");
         hang_system_2 = hardwareMap.dcMotor.get("hang_system_2");
+        servo_lift = hardwareMap.get(Servo.class, "servo_lift");
 
         liftLimitSwitch = hardwareMap.digitalChannel.get("liftLimitSwitch");
         liftLimitSwitch.setMode(DigitalChannel.Mode.INPUT);
@@ -41,9 +45,10 @@ public class ArmSystem {
     }
 
     public void startArm() {
-        lift_system.setPower(0.5);
+        lift_system.setPower(0.2);
         hang_system_1.setPower(1);
         hang_system_2.setPower(1);
+        servo_lift.setPosition(0.2);
     }
 
     public void checkSensors() {
@@ -71,6 +76,7 @@ public class ArmSystem {
         lift_system.setPower(0);
         hang_system_1.setPower(0);
         hang_system_2.setPower(0);
+        servo_lift.setPosition(0.75);
 
         // Возвращаем системы на нулевую позицию
         while (!liftLimitSwitch.getState()) {
